@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, useColorScheme } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-const API_ENDPOINT = 'https://coretoolshomologaapi.redeinova.com.br/api/auth';
+import { loginUser } from '../api/ApiRequests';
+import { useAppContext, actionTypes } from '../context/context'
+import * as SecureStore from 'expo-secure-store';
 
 const LoginScreen = () => {
+
+  const {  dispatch } = useAppContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -21,46 +25,39 @@ const LoginScreen = () => {
         return;
       }
 
-      // Make API request
-      const response = await fetch(API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          login: email,
-          senha: password,
-        }),
-      });
+      // Make API request using the loginUser function
+      const data = await loginUser(email, password);
 
-      if (response.ok) {
-        // Login successful
-        Alert.alert('Success', 'Login successful!');
-        // You can navigate to another screen or perform additional actions here
-      } else {
-        // Handle incorrect password
-        Alert.alert('Error', 'Incorrect email or password. Please try again.');
-      }
+      console.log(data.signature)
+
+      await SecureStore.setItemAsync('token', data.signature);
+
+      dispatch({ type: actionTypes.SET_TOKEN, payload: data.signature });
+
+      // Handle successful login
+      // You can navigate to another screen or perform additional actions here
+
     } catch (error) {
+      // Handle login error
       console.error('Login failed:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert('Error', error.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <LinearGradient colors={['#0F2027', '#203A43', '#2C5364']} style={styles.container}>
-      <View style={styles.inputContainer}>
+    <LinearGradient colors={darkMode ? ['#0F2027', '#333', '#2C5364'] : ['#093028', '#fff', '#237A57']} style={styles.container}>
+      <View style={[styles.inputContainer, { shadowColor: darkMode ? '#000' : '#888', shadowOpacity: 0.5, shadowRadius: 3, elevation: 5 }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: darkMode ? '#333' : '#f8f8f8', color: darkMode ? '#fff' : '#333' }]}
           placeholder="Email"
           onChangeText={(text) => setEmail(text)}
           value={email}
         />
         <View style={styles.passwordContainer}>
           <TextInput
-            style={styles.passwordInput}
+            style={[styles.passwordInput, { backgroundColor: darkMode ? '#333' : '#f8f8f8', color: darkMode ? '#fff' : '#333' }]}
             placeholder="Password"
             onChangeText={(text) => setPassword(text)}
             value={password}
@@ -70,7 +67,7 @@ const LoginScreen = () => {
             style={styles.passwordIcon}
             onPress={() => setShowPassword(!showPassword)}
           >
-            <MaterialCommunityIcons name={showPassword ? 'eye-off' : 'eye'} size={24} color="white" />
+            <MaterialCommunityIcons name={showPassword ? 'eye-off' : 'eye'} size={24} color={darkMode ? '#fff' : '#000'} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity
@@ -81,6 +78,12 @@ const LoginScreen = () => {
           <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        style={styles.darkModeToggle}
+        onPress={() => setDarkMode(!darkMode)}
+      >
+        <MaterialCommunityIcons name={darkMode ? 'weather-night' : 'weather-sunny'} size={30} color={darkMode ? '#fff' : 'white'} />
+      </TouchableOpacity>
     </LinearGradient>
   );
 };
@@ -93,26 +96,29 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '80%',
+    borderRadius: 8,
+    padding: 16,
   },
   input: {
     height: 40,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.8)',
     marginBottom: 10,
     paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    
   },
   passwordInput: {
     flex: 1,
     height: 40,
-    borderRadius: 4,  
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 4,
     marginBottom: 10,
     paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   passwordIcon: {
     padding: 10,
@@ -122,14 +128,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 4,
     borderWidth: 0,
-    backgroundColor: '#237A57',
-    borderColor: 'transparent',
-    display: 'flex',
-    fontFamily: 'JetBrains Mono, monospace',
-    height: 48,
     justifyContent: 'center',
     lineHeight: 1,
-    listStyle: 'none',
     overflow: 'hidden',
     paddingLeft: 16,
     paddingRight: 16,
@@ -139,7 +139,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  darkModeToggle: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    padding: 10,
+  },
 });
 
 export default LoginScreen;
-

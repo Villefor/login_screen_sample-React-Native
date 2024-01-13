@@ -3,12 +3,20 @@ import React, { createContext, useReducer, useContext } from 'react';
 const AppContext = createContext();
 
 const initialState = {
-  // Initial state values
+  token: null,
+  // Other initial state values
+};
+
+const actionTypes = {
+  SET_TOKEN: 'SET_TOKEN',
+  // Add other action types as needed
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    // Handle state changes based on action types
+    case actionTypes.SET_TOKEN:
+      return { ...state, token: action.payload };
+    // Add other cases for additional actions
     default:
       return state;
   }
@@ -25,7 +33,11 @@ const AppProvider = ({ children }) => {
 };
 
 const useAppContext = () => {
-  return useContext(AppContext);
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
 };
 
-export { AppProvider, useAppContext };
+export { AppProvider, useAppContext, actionTypes };
