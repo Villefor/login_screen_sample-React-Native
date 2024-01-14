@@ -4,19 +4,21 @@ const AppContext = createContext();
 
 const initialState = {
   token: null,
-  // Other initial state values
+  links: [],
 };
 
 const actionTypes = {
   SET_TOKEN: 'SET_TOKEN',
-  // Add other action types as needed
+  SET_LINKS: 'SET_LINKS',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.SET_TOKEN:
       return { ...state, token: action.payload };
-    // Add other cases for additional actions
+    case actionTypes.SET_LINKS: 
+      return { ...state, links: action.payload };
+    
     default:
       return state;
   }

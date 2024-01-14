@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, useColorScheme } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { loginUser } from '../api/ApiRequests';
 import { useAppContext, actionTypes } from '../context/context'
@@ -9,6 +10,9 @@ import * as SecureStore from 'expo-secure-store';
 const LoginScreen = () => {
 
   const {  dispatch } = useAppContext();
+
+  const navigation = useNavigation();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +37,10 @@ const LoginScreen = () => {
       await SecureStore.setItemAsync('token', data.signature);
 
       dispatch({ type: actionTypes.SET_TOKEN, payload: data.signature });
+
+      if(data.signature){
+        navigation.navigate('Menu');
+      }
 
       // Handle successful login
       // You can navigate to another screen or perform additional actions here
