@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-import { useAppContext } from '../context/context';
-import {fetchLinks} from '../api/ApiRequests';
-import { MaterialIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
+import { useAppContext } from "../context/context";
+import { fetchLinks } from "../api/ApiRequests";
+import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ListScreen = () => {
   const { state, dispatch } = useAppContext();
@@ -12,7 +19,6 @@ const ListScreen = () => {
   useEffect(() => {
     fetchLinks(dispatch);
   }, [dispatch]);
-
 
   const openLink = (url) => {
     Linking.openURL(url);
@@ -31,17 +37,13 @@ const ListScreen = () => {
               onPress={() => openLink(item.comando)}
             >
               <Text style={styles.goToText}>Abrir site</Text>
-              <MaterialIcons
-                name="arrow-forward"
-                size={24}
-                color="black"
-              />
+              <MaterialIcons name="arrow-forward" size={24} color="black" />
             </TouchableOpacity>
-              <MaterialIcons
-                name={item.icone === 'award' ? 'business' : 'support-agent'}
-                size={24}
-                color="black"
-              />
+            <MaterialIcons
+              name={item.icone === "award" ? "business" : "support-agent"}
+              size={24}
+              color="black"
+            />
           </View>
         </View>
       </View>
@@ -49,14 +51,21 @@ const ListScreen = () => {
   };
 
   return (
-    <LinearGradient colors={['#0F2027', '#333', '#237A57']} style={styles.container}>
+    <LinearGradient
+      colors={["#0F2027", "#333", "#237A57"]}
+      style={styles.container}
+    >
       <FlatList
         data={links}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         style={styles.flatList}
-        ListHeaderComponent={<Text style={styles.headerText}>Lista de Empresas Cadastradas</Text>}
-        ListFooterComponent={<Text style={styles.warningText}>Sem mais empresas registradas</Text>}
+        ListHeaderComponent={
+          <Text style={styles.headerText}>Lista de Empresas Cadastradas</Text>
+        }
+        ListFooterComponent={
+          <Text style={styles.warningText}>Sem mais empresas registradas</Text>
+        }
       />
     </LinearGradient>
   );
@@ -65,18 +74,18 @@ const ListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   flatList: {
-    width: '100%',
-    padding: '3%',
+    width: "100%",
+    padding: "3%",
   },
   card: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 8,
-    marginBottom: '3%',
-    shadowColor: '#000',
+    marginBottom: "3%",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -86,12 +95,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   linkItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
   },
   titleContainer: {
     flex: 1,
@@ -101,12 +110,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   icon: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 10,
   },
   goToText: {
@@ -114,14 +123,14 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
-    color: 'white',
-    textAlign: 'center',
+    color: "white",
+    textAlign: "center",
     marginBottom: 10,
   },
   warningText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 10,
-    color: 'white',
+    color: "white",
   },
 });
 
